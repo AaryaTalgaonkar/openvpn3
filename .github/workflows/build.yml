@@ -1,6 +1,6 @@
 name: Build
 
-on: [push, pull_request]
+on: [workflow_dispatch]
 
 jobs:
   msvc:
@@ -46,4 +46,56 @@ jobs:
             ${{ github.workspace }}/build/**/Release/omicliagent.exe
             ${{ github.workspace }}/build/**/omi/Release/*.dll
             ${{ github.workspace }}/build/**/ovpnagent/win/Release/*.dll
+  mac:
+    strategy:
+      matrix:
+        include:
+          - name: macOS arm64 14
+            runner: macos-14
+            arch: arm64
+          - name: macOS arm64 15
+            runner: macos-15
+            arch: arm64
+          - name: macOS arm64 26
+            runner: macos-26
+            arch: arm64
+          - name: macOS amd64 15
+            runner: macos-15-intel
+            arch: amd64
+            
 
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install asio cmake fmt jsoncpp lz4 openssl pkg-config xxhash
+          
+      - name: Configure build
+        run: |
+          mkdir build
+          cd build
+
+          if [[ "${{ matrix.arch }}" == "arm64" ]]; then
+            OPENSSL_ROOT="/opt/homebrew/opt/openssl"
+            PREFIX_PATH="/opt/homebrew"
+          else
+            OPENSSL_ROOT="/usr/local/opt/openssl"
+            PREFIX_PATH="/usr/local/opt"
+          fi
+          cmake -DOPENSSL_ROOT_DIR=$OPENSSL_ROOT -DCMAKE_PREFIX_PATH=$PREFIX_PATH
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --parallel
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build-${{matrix.name}}
+          path: build/openvpn3

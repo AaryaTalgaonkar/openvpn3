@@ -87,7 +87,7 @@ jobs:
             OPENSSL_ROOT="/usr/local/opt/openssl"
             PREFIX_PATH="/usr/local/opt"
           fi
-          cmake -DOPENSSL_ROOT_DIR=$OPENSSL_ROOT -DCMAKE_PREFIX_PATH=$PREFIX_PATH
+          cmake -DOPENSSL_ROOT_DIR=$OPENSSL_ROOT -DCMAKE_PREFIX_PATH=$PREFIX_PATH ..
 
       - name: Build
         run: |

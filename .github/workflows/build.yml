@@ -37,15 +37,34 @@ jobs:
       with:
         configurePreset: win-${{ matrix.arch }}-release
         buildPreset: win-${{ matrix.arch }}-release
-
-    - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+            
+    - name: Collect selected binaries into single folder
+      shell: powershell
+      run: |
+        $out = "${{ github.workspace }}\staging\${{ matrix.arch }}"
+        New-Item -ItemType Directory -Force -Path $out
+    
+        Get-ChildItem "${{ github.workspace }}\build" -Recurse -Filter ovpnagent.exe |
+          Where-Object { $_.FullName -match "\\Release\\" } |
+          Copy-Item -Destination $out -Force
+    
+        Get-ChildItem "${{ github.workspace }}\build" -Recurse -Filter omicliagent.exe |
+          Where-Object { $_.FullName -match "\\Release\\" } |
+          Copy-Item -Destination $out -Force
+    
+        Get-ChildItem "${{ github.workspace }}\build\omi" -Recurse -Filter *.dll |
+          Where-Object { $_.FullName -match "\\Release\\" } |
+          Copy-Item -Destination $out -Force
+    
+        Get-ChildItem "${{ github.workspace }}\build\ovpnagent\win" -Recurse -Filter *.dll |
+          Where-Object { $_.FullName -match "\\Release\\" } |
+          Copy-Item -Destination $out -Force
+    
+    - uses: actions/upload-artifact@v6
       with:
-        name: backend-build-win-${{matrix.arch}}
-        path: |
-            ${{ github.workspace }}/build/**/Release/ovpnagent.exe
-            ${{ github.workspace }}/build/**/Release/omicliagent.exe
-            ${{ github.workspace }}/build/**/omi/Release/*.dll
-            ${{ github.workspace }}/build/**/ovpnagent/win/Release/*.dll
+        name: backend-build-win-${{ matrix.arch }}
+        path: ${{ github.workspace }}/staging/${{ matrix.arch }}
+    
   mac:
     strategy:
       matrix:

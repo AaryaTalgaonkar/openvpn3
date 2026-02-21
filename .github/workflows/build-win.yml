@@ -58,7 +58,6 @@ jobs:
     - name: Upload backend binaries
       uses: actions/upload-artifact@v4
       with:
-        name: backend-build-win-${{ matrix.arch }}.zip
+        name: backend-build-win-${{ matrix.arch }}
         path: | 
-                ${{ github.workspace }}/staging/${{ matrix.arch }}/*.exe
-                ${{ github.workspace }}/staging/${{ matrix.arch }}/*.dll
+                ${{ github.workspace }}\staging\${{ matrix.arch }}\

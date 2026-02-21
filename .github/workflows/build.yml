@@ -41,18 +41,25 @@ jobs:
     - name: Collect selected binaries into single folder
       shell: powershell
       run: |
-        $out = "${{ github.workspace }}\staging\${{matrix.arch}}"
+        $out = "${{ github.workspace }}\staging\${{ matrix.arch }}"
         New-Item -ItemType Directory -Force -Path $out
     
-        Copy-Item "${{ github.workspace }}/build/**/Release/ovpnagent.exe" $out 
-        Copy-Item "${{ github.workspace }}/build/**/Release/omicliagent.exe" $out 
-        Copy-Item "${{ github.workspace }}/build/**/omi/Release/*.dll" $out 
-        Copy-Item "${{ github.workspace }}/build/**/ovpnagent/win/Release/*.dll" $out 
+        Get-ChildItem "${{ github.workspace }}\build" -Recurse |
+          Where-Object {
+            $_.FullName -like "*\Release\ovpnagent.exe" -or
+            $_.FullName -like "*\Release\omicliagent.exe" -or
+            $_.FullName -like "*\omi\Release\*.dll" -or
+            $_.FullName -like "*\ovpnagent\win\Release\*.dll"
+          } |
+          Copy-Item -Destination $out -Force
+    
+        Get-ChildItem $out
         
-    - uses: actions/upload-artifact@v6
+    - name: Upload backend binaries
+      uses: actions/upload-artifact@v6
       with:
         name: backend-build-win-${{ matrix.arch }}
-        path: ${{ github.workspace }}/staging/${{matrix.arch}}
+        path: ${{ github.workspace }}/staging/${{ matrix.arch }}
     
   mac:
     strategy:

@@ -41,29 +41,18 @@ jobs:
     - name: Collect selected binaries into single folder
       shell: powershell
       run: |
-        $out = "${{ github.workspace }}\staging\${{ matrix.arch }}"
+        $out = "${{ github.workspace }}\staging\${{matrix.arch}}"
         New-Item -ItemType Directory -Force -Path $out
     
-        Get-ChildItem "${{ github.workspace }}\build" -Recurse -Filter ovpnagent.exe |
-          Where-Object { $_.FullName -match "\\Release\\" } |
-          Copy-Item -Destination $out -Force
-    
-        Get-ChildItem "${{ github.workspace }}\build" -Recurse -Filter omicliagent.exe |
-          Where-Object { $_.FullName -match "\\Release\\" } |
-          Copy-Item -Destination $out -Force
-    
-        Get-ChildItem "${{ github.workspace }}\build\omi" -Recurse -Filter *.dll |
-          Where-Object { $_.FullName -match "\\Release\\" } |
-          Copy-Item -Destination $out -Force
-    
-        Get-ChildItem "${{ github.workspace }}\build\ovpnagent\win" -Recurse -Filter *.dll |
-          Where-Object { $_.FullName -match "\\Release\\" } |
-          Copy-Item -Destination $out -Force
-    
+        Copy-Item "${{ github.workspace }}/build/**/Release/ovpnagent.exe" $out 
+        Copy-Item "${{ github.workspace }}/build/**/Release/omicliagent.exe" $out 
+        Copy-Item "${{ github.workspace }}/build/**/omi/Release/*.dll" $out 
+        Copy-Item "${{ github.workspace }}/build/**/ovpnagent/win/Release/*.dll" $out 
+        
     - uses: actions/upload-artifact@v6
       with:
         name: backend-build-win-${{ matrix.arch }}
-        path: ${{ github.workspace }}/staging/${{ matrix.arch }}
+        path: ${{ github.workspace }}/staging/${{matrix.arch}}
     
   mac:
     strategy:

@@ -1,7 +1,5 @@
 name: coverity-scan
 on:
-  schedule:
-    - cron: '0 20 * * *' # Daily at 20:00 UTC
   workflow_dispatch:
 
 jobs:

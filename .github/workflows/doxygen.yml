@@ -1,7 +1,5 @@
 name: Deploy Doxygen documentation to Pages
 on:
-  push:
-    branches: ["master"]
   workflow_dispatch:
 concurrency:
   group: "pages"

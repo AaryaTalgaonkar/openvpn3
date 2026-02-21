@@ -59,7 +59,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: backend-build-win-${{ matrix.arch }}
-        path: ${{ github.workspace }}/staging/${{ matrix.arch }}
+        path: ${{ github.workspace }}/staging/${{ matrix.arch }}/*
     
   mac:
     strategy:

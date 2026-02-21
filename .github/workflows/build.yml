@@ -56,7 +56,7 @@ jobs:
         Get-ChildItem $out
         
     - name: Upload backend binaries
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
         name: backend-build-win-${{ matrix.arch }}
         path: ${{ github.workspace }}/staging/${{ matrix.arch }}

@@ -1,4 +1,4 @@
-name: Build
+name: Windows Build
 
 on: [workflow_dispatch]
 
@@ -58,7 +58,7 @@ jobs:
     - name: Upload backend binaries
       uses: actions/upload-artifact@v4
       with:
-        name: backend-build-win-${{ matrix.arch }}
+        name: backend-build-win-${{ matrix.arch }}.zip
         path: | 
                 ${{ github.workspace }}/staging/${{ matrix.arch }}/*.exe
                 ${{ github.workspace }}/staging/${{ matrix.arch }}/*.dll

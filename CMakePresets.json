@@ -25,7 +25,7 @@
             "generator": "Visual Studio 17 2022",
             "cacheVariables": {
                 "CLI_OVPNDCOWIN": {
-                    "value": "ON",
+                    "value": "OFF",
                     "type": "BOOL"
                 },
                 "VCPKG_MANIFEST_DIR": "${sourceDir}/deps/vcpkg_manifests/windows",

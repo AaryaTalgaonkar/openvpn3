@@ -56,9 +56,14 @@ jobs:
           mkdir artifact
           cp build/openvpn/omi/omicliagent artifact/
           cp build/openvpn/ovpnagent/mac/agent_macos artifact/      
+
+      - name: Create tarball
+        run: |
+          tar -cvf backend-build-${{ matrix.name }}.tar -C artifact .
+
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: backend-build-${{ matrix.name }}
-          path: artifact
+          path: backend-build-${{ matrix.name }}.tar

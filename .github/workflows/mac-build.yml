@@ -50,11 +50,15 @@ jobs:
         run: |
           cd build
           cmake --build .
-          
+                
+      - name: Collect artifacts
+        run: |
+          mkdir artifact
+          cp build/openvpn/omi/omicliagent artifact/
+          cp build/openvpn/ovpnagent/mac/agent_macos artifact/      
+      
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: backend-build-${{matrix.name}}
-          path: |
-              ${{ github.workspace }}/build/openvpn/omi/omicliagent
-              ${{ github.workspace }}/build/openvpn/ovpnagent/mac/agent_macos
+          name: backend-build-${{ matrix.name }}
+          path: artifact

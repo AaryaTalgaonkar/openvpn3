@@ -56,5 +56,6 @@ jobs:
         with:
           name: backend-build-${{matrix.name}}
           path: |
-              ${{ github.workspace }}/build/openvpn/omi/omicliagent_macos
-              ${{ github.workspace }}/build/openvpn/ovpnagent/mac/agent_macos
+              ${{ github.workspace }}/build
+              # ${{ github.workspace }}/build/openvpn/omi/omicliagent_macos
+              # ${{ github.workspace }}/build/openvpn/ovpnagent/mac/agent_macos

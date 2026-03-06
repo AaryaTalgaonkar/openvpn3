@@ -49,13 +49,12 @@ jobs:
       - name: Build
         run: |
           cd build
-          cmake --build . --parallel
+          cmake --build .
           
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: backend-build-${{matrix.name}}
           path: |
-              ${{ github.workspace }}/build
-              # ${{ github.workspace }}/build/openvpn/omi/omicliagent_macos
-              # ${{ github.workspace }}/build/openvpn/ovpnagent/mac/agent_macos
+              ${{ github.workspace }}/build/openvpn/omi/omicliagent
+              ${{ github.workspace }}/build/openvpn/ovpnagent/mac/agent_macos

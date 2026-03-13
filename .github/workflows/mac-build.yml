@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           brew update
-          brew install asio cmake fmt jsoncpp lz4 openssl pkg-config xxhash
+          brew install asio cmake fmt jsoncpp lz4 openssl pkg-config xxhash dylibbundler
           
       - name: Configure build
         run: |
@@ -50,12 +50,24 @@ jobs:
         run: |
           cd build
           cmake --build .
+      
+      - name: Bundle dylibs
+        run: |
+          mkdir -p artifact/lib
+      
+          dylibbundler -od -b \
+            -x build/openvpn/omi/omicliagent \
+            -d artifact/lib
+      
+          dylibbundler -od -b \
+            -x build/openvpn/ovpnagent/mac/agent_macos \
+            -d artifact/lib
                 
       - name: Collect artifacts
         run: |
-          mkdir artifact
-          cp build/openvpn/omi/omicliagent artifact/
-          cp build/openvpn/ovpnagent/mac/agent_macos artifact/      
+          mkdir -p artifact/bin
+          cp build/openvpn/omi/omicliagent artifact/bin/
+          cp build/openvpn/ovpnagent/mac/agent_macos artifact/bin/
 
       - name: Create tarball
         run: |

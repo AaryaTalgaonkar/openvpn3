@@ -51,19 +51,23 @@ jobs:
           cd build
           cmake --build .
       
-      - name: Bundle dylibs
+      - name: Prepare artifact layout
         run: |
           mkdir -p artifact/omicliagent/lib
           mkdir -p artifact/agent/lib
       
-          dylibbundler -od -b -x build/openvpn/omi/omicliagent -d artifact/omicliagent/lib
-      
-          dylibbundler -od -b -x build/openvpn/ovpnagent/mac/agent_macos -d artifact/agent/lib
-                
-      - name: Collect artifacts
-        run: |
           cp build/openvpn/omi/omicliagent artifact/omicliagent/
           cp build/openvpn/ovpnagent/mac/agent_macos artifact/agent/
+      
+      - name: Bundle dylibs
+        run: |
+          dylibbundler -od -b \
+            -x artifact/omicliagent/omicliagent \
+            -d artifact/omicliagent/lib
+      
+          dylibbundler -od -b \
+            -x artifact/agent/agent_macos \
+            -d artifact/agent/lib
 
       - name: Create tarball
         run: |

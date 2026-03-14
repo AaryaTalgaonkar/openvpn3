@@ -54,18 +54,16 @@ jobs:
       - name: Prepare artifact layout
         run: |
           mkdir -p artifact/libs
+          mkdir -p artifact/openvnp3
       
-          cp build/openvpn/omi/omicliagent artifact/
-          cp build/openvpn/ovpnagent/mac/agent_macos artifact/
+          cp build/openvpn/omi/omicliagent artifact/openvpn3
+          cp build/openvpn/ovpnagent/mac/agent_macos artifact/openvpn3
       
       - name: Bundle dylibs
         run: |
           dylibbundler -od -b \
-            -x artifact/omicliagent \
-            -d artifact/libs
-      
-          dylibbundler -od -b \
-            -x artifact/agent_macos \
+            -x artifact/openvpn3/omicliagent \
+            -x artifact/openvpn3/agent_macos \
             -d artifact/libs
 
       - name: Create tarball

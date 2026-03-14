@@ -54,7 +54,7 @@ jobs:
       - name: Prepare artifact layout
         run: |
           mkdir -p artifact/libs
-          mkdir -p artifact/openvnp3
+          mkdir -p artifact/openvpn3
       
           cp build/openvpn/omi/omicliagent artifact/openvpn3
           cp build/openvpn/ovpnagent/mac/agent_macos artifact/openvpn3

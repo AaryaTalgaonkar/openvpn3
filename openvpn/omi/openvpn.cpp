@@ -509,7 +509,7 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
                 OpenSSLPKI::X509 cert;
                 cert.parse_pem(cert_text, "cert");
                 OPENVPN_LOG("Client cert CN: OpenSSL parse_pem ok");
-                cn = OpenSSLPKI::x509_get_field(cert.get(), NID_commonName);
+                cn = OpenSSLPKI::x509_get_field(cert.obj(), NID_commonName);
                 OPENVPN_LOG("Client cert CN: OpenSSL raw CN='" << cn << "'");
             }
             catch (const OpenSSLException &e)

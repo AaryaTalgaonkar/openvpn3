@@ -500,7 +500,7 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
             }
 
             // Parse certificate and extract CN using the appropriate backend
-#if defined(OPENVPN_USE_OPENSSL)
+#if defined(USE_OPENSSL)
             OPENVPN_LOG("Client cert CN: using OpenSSL backend");
             // OpenSSL path: parse cert and extract CN
             try
@@ -517,7 +517,7 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
                 cn.clear();
                 OPENVPN_LOG("Client cert CN: OpenSSL error: " << e.what());
             }
-#elif defined(OPENVPN_USE_MBEDTLS)
+#elif defined(USE_MBEDTLS)
             OPENVPN_LOG("Client cert CN: using mbedTLS backend");
             // mbedTLS path: parse cert and extract CN
             try

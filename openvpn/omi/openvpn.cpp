@@ -88,10 +88,7 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
           opt(std::move(opt_arg)),
           reconnect_timer(io_context),
           bytecount_timer(io_context),
-
-#ifdef OPENVPN_PLATFORM_WIN
           exit_event(io_context),
-#endif
           log_context(this)
     {
         signals.reset(new ASIOSignals(io_context));
@@ -115,7 +112,6 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
         management_query_remote = opt.exists("management-query-remote");
         exit_event_name = opt.get_optional("exit-event-name", 1, 256);
 
-#ifdef OPENVPN_PLATFORM_WIN
         // passed by OpenVPN GUI to trigger exit
         if (!exit_event_name.empty())
         {
@@ -126,7 +122,6 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
 				  return;
 				self->stop(); });
         }
-#endif
 
         // http-proxy-override
         {
@@ -461,6 +456,55 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
         auth_password = "";
     }
 
+    // Extract Common Name from client certificate
+    std::string get_client_cert_cn()
+    {
+        try
+        {
+            // Get the certificate text from the parsed config options
+            const Option *cert_opt = opt.get_ptr("cert");
+            if (!cert_opt)
+                return "";
+            
+            // Get the multiline cert content (index 1 contains the cert body)
+            std::string cert_text = cert_opt->get(1, Option::MULTILINE);
+            if (cert_text.empty())
+                return "";
+            
+            // Parse certificate and extract CN using the appropriate backend
+#if defined(OPENVPN_USE_OPENSSL)
+            // OpenSSL path: parse cert and extract CN
+            try
+            {
+                OpenSSLPKI::X509 cert;
+                cert.parse_pem(cert_text, "cert");
+                return OpenSSLPKI::x509_get_field(cert.get(), NID_commonName);
+            }
+            catch (const OpenSSLException &)
+            {
+                return "";
+            }
+#elif defined(OPENVPN_USE_MBEDTLS)
+            // mbedTLS path: parse cert and extract CN
+            try
+            {
+                MbedTLSPKI::X509Cert cert;
+                cert.parse(cert_text, "cert", true);
+                return MbedTLSPKI::x509_get_common_name(&cert.get_x509_crt());
+            }
+            catch (const MbedTLSException &)
+            {
+                return "";
+            }
+#endif
+        }
+        catch (const std::exception &)
+        {
+            // Silently fail - prefer to proceed without CN fallback than to block authentication
+            return "";
+        }
+    }
+
     void provide_username_password(const std::string &type, const std::string &username, const std::string &password)
     {
         if (!dc_cookie.empty())
@@ -482,7 +526,15 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
         else if (type == "Auth")
         {
             creds.reset(new ClientAPI::ProvideCreds);
-            creds->username = username;
+            // Use provided username, or fall back to client certificate CN if empty
+            if (!username.empty())
+            {
+                creds->username = username;
+            }
+            else
+            {
+                creds->username = get_client_cert_cn();
+            }
             creds->password = password;
         }
         else if (type == "HTTP Proxy")
@@ -658,10 +710,8 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
         async_stop.stop();
 
         // cancel wait on exit_event
-#ifdef OPENVPN_PLATFORM_WIN
         if (exit_event.is_open())
             exit_event.cancel();
-#endif
 
         // stop timers
         reconnect_timer.cancel();
@@ -1008,10 +1058,8 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
     // signals
     ASIOSignals::Ptr signals;
 
-#ifdef OPENVPN_PLATFORM_WIN
     typedef openvpn_io::windows::object_handle AsioEvent;
     AsioEvent exit_event;
-#endif
     std::string exit_event_name;
 
     Log::Context log_context; // should be initialized last
@@ -1058,9 +1106,7 @@ int run(OptionList opt)
 
     try
     {
-#ifdef OPENVPN_PLATFORM_WIN
         TunWin::NRPT::delete_rules(0); // delete stale NRPT rules
-#endif
         omi.reset(new OMI(io_context, std::move(opt)));
         omi->start();
         io_context_run_called = true;

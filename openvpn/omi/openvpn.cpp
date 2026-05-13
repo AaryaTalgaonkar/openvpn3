@@ -110,6 +110,7 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
         remote_override = opt.get_optional("remote-override", 1, 256);
         management_up_down = opt.exists("management-up-down");
         management_query_remote = opt.exists("management-query-remote");
+        auth_use_cert_cn_username = opt.exists("auth-use-cert-cn-username");
         exit_event_name = opt.get_optional("exit-event-name", 1, 256);
 
         // passed by OpenVPN GUI to trigger exit
@@ -367,7 +368,7 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
                 config->wintun = true;
 
             if (!eval.autologin && management_query_passwords && !creds)
-                query_username_password("Auth", !dc_cookie.empty(), eval.staticChallenge, eval.staticChallengeEcho);
+                query_username_password("Auth", auth_use_cert_cn_username || !dc_cookie.empty(), eval.staticChallenge, eval.staticChallengeEcho);
             else if (proxy_need_creds)
                 query_username_password("HTTP Proxy", false, "", false);
             else if (management_query_remote && !did_query_remote)
@@ -443,7 +444,8 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
             send("SUCCESS: '" + auth_type + "' " + up + " entered, but not yet verified\r\n");
         if ((!auth_username.empty() || auth_password_only) && !auth_password.empty())
         {
-            provide_username_password(auth_type, auth_username, auth_password);
+            const std::string provide_type = (auth_type == "Auth" && auth_password_only) ? "AuthCertCN" : auth_type;
+            provide_username_password(provide_type, auth_username, auth_password);
             reset_auth_cmd();
         }
     }
@@ -526,15 +528,13 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
         else if (type == "Auth")
         {
             creds.reset(new ClientAPI::ProvideCreds);
-            // Use provided username, or fall back to client certificate CN if empty
-            if (!username.empty())
-            {
-                creds->username = username;
-            }
-            else
-            {
-                creds->username = get_client_cert_cn();
-            }
+            creds->username = username;
+            creds->password = password;
+        }
+        else if (type == "AuthCertCN")
+        {
+            creds.reset(new ClientAPI::ProvideCreds);
+            creds->username = get_client_cert_cn();
             creds->password = password;
         }
         else if (type == "HTTP Proxy")
@@ -1014,6 +1014,7 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
     // auth
     bool management_query_passwords = false;
     bool auth_nocache = false;
+    bool auth_use_cert_cn_username = false;
     std::string auth_type;
     bool auth_password_only = false;
     std::string auth_username;

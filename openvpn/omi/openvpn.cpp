@@ -458,7 +458,6 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
         auth_password = "";
     }
 
-    // Extract Common Name from client certificate
     std::string get_client_cert_cn()
     {
         std::string cn;
@@ -466,7 +465,6 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
         {
             OPENVPN_LOG("Client cert CN: begin");
 
-            // Parse the client config content so embedded <cert> blocks are visible here.
             OptionList config_opt;
             if (config)
             {
@@ -480,7 +478,6 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
                 OPENVPN_LOG("Client cert CN: no config available");
             }
 
-            // Get the certificate text from the parsed config options
             const Option *cert_opt = config ? config_opt.get_ptr("cert") : nullptr;
             if (!cert_opt)
             {
@@ -490,7 +487,6 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
 
             OPENVPN_LOG("Client cert CN: found <cert> option, argc=" << cert_opt->size());
 
-            // Get the multiline cert content (index 1 contains the cert body)
             std::string cert_text = cert_opt->get(1, Option::MULTILINE);
             OPENVPN_LOG("Client cert PEM length: " << cert_text.size());
             if (cert_text.empty())
@@ -499,10 +495,8 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
                 return "";
             }
 
-            // Parse certificate and extract CN using the appropriate backend
 #if defined(USE_OPENSSL)
             OPENVPN_LOG("Client cert CN: using OpenSSL backend");
-            // OpenSSL path: parse cert and extract CN
             try
             {
                 OPENVPN_LOG("Client cert CN: OpenSSL parse_pem start");
@@ -519,14 +513,13 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
             }
 #elif defined(USE_MBEDTLS)
             OPENVPN_LOG("Client cert CN: using mbedTLS backend");
-            // mbedTLS path: parse cert and extract CN
             try
             {
                 OPENVPN_LOG("Client cert CN: mbedTLS parse start");
                 MbedTLSPKI::X509Cert cert;
                 cert.parse(cert_text, "cert", true);
                 OPENVPN_LOG("Client cert CN: mbedTLS parse ok");
-                cn = MbedTLSPKI::x509_get_common_name(&cert.get_x509_crt());
+                cn = MbedTLSPKI::x509_get_common_name(cert.get());
                 OPENVPN_LOG("Client cert CN: mbedTLS raw CN='" << cn << "'");
             }
             catch (const MbedTLSException &e)
@@ -540,7 +533,6 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
         }
         catch (const std::exception &e)
         {
-            // Log and fail - prefer to proceed without CN fallback than to block authentication
             cn.clear();
             OPENVPN_LOG("Client cert CN: exception: " << e.what());
         }

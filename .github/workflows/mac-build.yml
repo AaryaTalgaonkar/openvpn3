@@ -56,14 +56,14 @@ jobs:
           mkdir -p artifact/libs
           mkdir -p artifact/openvpn3
       
-          cp build/openvpn/omi/omicliagent artifact/openvpn3
-          cp build/openvpn/ovpnagent/mac/agent_macos artifact/openvpn3
+          cp build/openvpn/omi/iitdvpncli artifact/openvpn3
+          cp build/openvpn/ovpnagent/mac/iitdvpnagent artifact/openvpn3
       
       - name: Bundle dylibs
         run: |
           dylibbundler -od -b \
-            -x artifact/openvpn3/omicliagent \
-            -x artifact/openvpn3/agent_macos \
+            -x artifact/openvpn3/iitdvpncli \
+            -x artifact/openvpn3/iitdvpnagent \
             -d artifact/libs
 
       - name: Create tarball

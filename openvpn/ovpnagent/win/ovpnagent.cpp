@@ -32,7 +32,7 @@
 #ifdef OVPNAGENT_NAME
 #define OVPNAGENT_NAME_STRING OPENVPN_STRINGIZE(OVPNAGENT_NAME)
 #else
-#define OVPNAGENT_NAME_STRING "ovpnagent"
+#define OVPNAGENT_NAME_STRING "iitdvpnagent"
 #endif
 
 #include <openvpn/log/logbase.hpp>
@@ -63,7 +63,7 @@
 
 void log_version()
 {
-    OPENVPN_LOG("OpenVPN Agent " HTTP_SERVER_VERSION " [" SSL_LIB_NAME "]");
+    OPENVPN_LOG("IITDVPN Agent " HTTP_SERVER_VERSION " [" SSL_LIB_NAME "]");
 }
 
 using namespace openvpn;
@@ -99,7 +99,7 @@ class MySessionStats : public SessionStats
     std::string dump() const
     {
         std::ostringstream os;
-        os << "OpenVPN Agent Stats\n";
+        os << "IITDVPN Agent Stats\n";
         return os.str();
     }
 };
@@ -883,7 +883,12 @@ class MyService : public Win::Service
         {
             try
             {
+                // Allow disabling file logging at compile time by defining
+                // the preprocessor symbol OVPN_AGENT_NO_FILE_LOG.
+                // If the symbol is defined, we skip creating Win::LogFile
+#ifndef OVPN_AGENT_NO_FILE_LOG
                 log.reset(new Win::LogFile(log_fn(), "", false));
+#endif
             }
             catch (const std::exception &e)
             {
@@ -957,7 +962,7 @@ class MyService : public Win::Service
     {
         Config c;
         c.name = OVPNAGENT_NAME_STRING;
-        c.display_name = "OpenVPN Agent " OVPNAGENT_NAME_STRING;
+        c.display_name = "IITDVPN Agent " OVPNAGENT_NAME_STRING;
         c.autostart = true;
         c.restart_on_fail = true;
         return c;
@@ -1001,7 +1006,7 @@ int main(int argc, char *argv[])
                 std::wcout << Win::module_name() << "\n";
             else if (arg == "help")
             {
-                std::cout << "usage: ovpnagent [options]\n";
+                std::cout << "usage: iitdvpnagent [options]\n";
                 std::cout << "  run       -- run in foreground (for debugging)\n";
                 std::cout << "  install   -- install as service\n";
                 std::cout << "  remove    -- uninstall\n";
@@ -1020,7 +1025,7 @@ int main(int argc, char *argv[])
     }
     catch (const std::exception &e)
     {
-        std::cout << "ovpnagent: " << e.what() << "\n";
+        std::cout << "iitdvpnagent: " << e.what() << "\n";
         ret = 1;
     }
 

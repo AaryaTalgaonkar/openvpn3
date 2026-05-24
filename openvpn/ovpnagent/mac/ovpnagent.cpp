@@ -32,7 +32,7 @@
 #ifdef OVPNAGENT_NAME
 #define OVPNAGENT_NAME_STRING OPENVPN_STRINGIZE(OVPNAGENT_NAME)
 #else
-#define OVPNAGENT_NAME_STRING "ovpnagent"
+#define OVPNAGENT_NAME_STRING "iitdvpnagent"
 #endif
 
 #include <openvpn/log/logbase.hpp>
@@ -58,7 +58,7 @@
 
 void log_version()
 {
-    std::cout << "OpenVPN Agent (Mac) " HTTP_SERVER_VERSION " [" SSL_LIB_NAME "]"
+    std::cout << "IITDVPN Agent (Mac) " HTTP_SERVER_VERSION " [" SSL_LIB_NAME "]"
 #ifdef OPENVPN_DEBUG
               << " built on " __DATE__ " " __TIME__
 #endif
@@ -80,7 +80,7 @@ class MySessionStats : public SessionStats
     std::string dump() const
     {
         std::ostringstream os;
-        os << "OpenVPN Agent Stats\n";
+        os << "IITDVPN Agent Stats\n";
         return os.str();
     }
 };
@@ -753,7 +753,7 @@ int main(int argc, char *argv[])
     catch (const usage &)
     {
         log_version();
-        std::cout << "usage: ovpnagent [options]\n";
+        std::cout << "usage: iitdvpnagent [options]\n";
         std::cout << "  --daemon <file>, -d       : daemonize, log to file\n";
         std::cout << "  --append, -a              : append to log file\n";
         std::cout << "  --pidfile <file>, -p      : write pid to file\n";

@@ -44,7 +44,7 @@ using namespace openvpn;
 
 std::string log_version()
 {
-    return platform_string("OpenVPN Management Interface", OMI_VERSION)
+    return platform_string("IITDVPN Management Interface", OMI_VERSION)
            + " [" SSL_LIB_NAME "] - server starting";
 }
 
@@ -1156,7 +1156,7 @@ int run(OptionList opt)
             omi->stop();
         if (io_context_run_called)
             io_context.poll(); // execute completion handlers,
-        std::cerr << "openvpn: run loop exception: " << e.what() << "\n";
+        std::cerr << "iitdvpncli: run loop exception: " << e.what() << "\n";
         ret = 1;
     }
     return ret;
@@ -1175,13 +1175,13 @@ int main(int argc, char *argv[])
         else
         {
             std::cout << log_version() << "\n";
-            std::cout << "Usage: openvpn [args...]\n";
+            std::cout << "Usage: iitdvpncli [args...]\n";
             ret = 2;
         }
     }
     catch (const std::exception &e)
     {
-        std::cerr << "openvpn: " << e.what() << "\n";
+        std::cerr << "iitdvpncli: " << e.what() << "\n";
         ret = 1;
     }
     return ret;

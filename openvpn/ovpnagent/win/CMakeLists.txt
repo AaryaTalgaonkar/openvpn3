@@ -2,7 +2,13 @@ if (NOT WIN32)
   return()
 endif()
 
-add_executable(ovpnagent ovpnagent.cpp)
-add_core_dependencies(ovpnagent)
-add_json_library(ovpnagent)
-target_compile_definitions(ovpnagent PRIVATE -DOVPNAGENT_DISABLE_PATH_CHECK -DOPENVPN_AGENT_START_PROCESS)
+add_executable(iitdvpnagent ovpnagent.cpp)
+add_core_dependencies(iitdvpnagent)
+add_json_library(iitdvpnagent)
+option(ENABLE_AGENT_FILE_LOG "Enable writing agent.log file" OFF)
+
+if (NOT ENABLE_AGENT_FILE_LOG)
+  target_compile_definitions(iitdvpnagent PRIVATE OVPN_AGENT_NO_FILE_LOG)
+endif()
+
+target_compile_definitions(iitdvpnagent PRIVATE -DOVPNAGENT_DISABLE_PATH_CHECK)

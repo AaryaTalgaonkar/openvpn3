@@ -681,7 +681,7 @@ class OMICore : public Acceptor::ListenerBase
 
     void send_title_message()
     {
-        send(">INFO:OpenVPN Management Interface Version 1 -- type 'help' for more info\r\n");
+        send(">INFO:IITDVPN Management Interface Version 1 -- type 'help' for more info\r\n");
     }
 
     void send_password_prompt()

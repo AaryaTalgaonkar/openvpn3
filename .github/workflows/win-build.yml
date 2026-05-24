@@ -45,7 +45,7 @@ jobs:
         New-Item -ItemType Directory -Force -Path $out
     
         Get-ChildItem "${{ github.workspace }}\build" -Recurse |
-          Where-Obect {
+          Where-Object {
             $_.FullName -like "*\Release\iitdvpnagent.exe" -or
             $_.FullName -like "*\Release\iitdvpncli.exe" -or
             $_.FullName -like "*\omi\Release\*.dll" -or

@@ -898,14 +898,10 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
             creds.reset();
             did_query_remote = false;
 
-            // exit/reconnect
-            if (autologin)
-            {
-                set_final_error(">FATAL: auth-failure: " + ev.info + "\r\n");
-                stop();
-            }
-            else
-                deferred_reconnect(1, "auth-failure");
+
+            set_final_error(">FATAL: auth-failure: " + ev.info + "\r\n");
+            stop();
+            
         }
 
         else if (ev.name == "CLIENT_HALT")

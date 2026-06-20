@@ -14,6 +14,7 @@ endif()
 add_executable(iitdvpncli openvpn.cpp)
 add_core_dependencies(iitdvpncli)
 add_json_library(iitdvpncli)
+target_link_libraries(iitdvpncli xkey)
 target_compile_definitions(iitdvpncli PRIVATE -DOPENVPN_COMMAND_AGENT -DOVPNAGENT_DISABLE_PATH_CHECK)
 
 add_executable(omicli openvpn.cpp)

@@ -40,7 +40,7 @@ class UnixCommandAgent : public TunBuilderSetup::Factory
   public:
     typedef RCPtr<UnixCommandAgent> Ptr;
 
-    OPENVPN_EXCEPTION(ovpnagent);
+    OPENVPN_EXCEPTION(iitdvpnagent);
 
     static TunBuilderSetup::Factory::Ptr new_agent(const OptionList &opt)
     {
@@ -114,10 +114,10 @@ class UnixCommandAgent : public TunBuilderSetup::Factory
                 if (sock.peercreds(creds))
                 {
                     if (!creds.root_uid())
-                        OPENVPN_THROW(ovpnagent, "unix socket server " << host << " not running as root");
+                        OPENVPN_THROW(iitdvpnagent, "unix socket server " << host << " not running as root");
                 }
                 else
-                    OPENVPN_THROW(ovpnagent, "unix socket server " << host << " could not be validated");
+                    OPENVPN_THROW(iitdvpnagent, "unix socket server " << host << " could not be validated");
             };
 
             return ts;
@@ -185,7 +185,7 @@ class UnixCommandAgent : public TunBuilderSetup::Factory
                 }
                 catch (const std::exception &e)
                 {
-                    OPENVPN_THROW(ovpnagent, "cannot fetch tunnel fd from agent: " << e.what());
+                    OPENVPN_THROW(iitdvpnagent, "cannot fetch tunnel fd from agent: " << e.what());
                 }
             };
 
@@ -243,26 +243,26 @@ class UnixCommandAgent : public TunBuilderSetup::Factory
         {
             // Get content
             if (ts.transactions.size() != 1)
-                throw ovpnagent("unexpected transaction set size");
+                throw iitdvpnagent("unexpected transaction set size");
             WS::ClientSet::Transaction &t = *ts.transactions[0];
             const std::string content = t.content_in.to_string();
             os << t.format_status(ts) << "\n";
             if (!t.comm_status_success())
             {
                 os << content;
-                throw ovpnagent("communication error");
+                throw iitdvpnagent("communication error");
             }
             if (!t.request_status_success())
             {
                 os << content;
-                throw ovpnagent("request error");
+                throw iitdvpnagent("request error");
             }
 
             // Verify content-type
             if (t.reply.headers.get_value_trim("content-type") != "application/json")
             {
                 os << content;
-                throw ovpnagent("unexpected content-type");
+                throw iitdvpnagent("unexpected content-type");
             }
 
             // Parse the returned json dict
@@ -270,13 +270,13 @@ class UnixCommandAgent : public TunBuilderSetup::Factory
             {
                 Json::Value jres = json::parse(content);
                 if (!jres.isObject())
-                    throw ovpnagent("returned JSON content is not a dictionary");
+                    throw iitdvpnagent("returned JSON content is not a dictionary");
                 return jres;
             }
             catch (const json::json_parse &e)
             {
                 os << content;
-                OPENVPN_THROW(ovpnagent, "error parsing returned JSON: " << e.what());
+                OPENVPN_THROW(iitdvpnagent, "error parsing returned JSON: " << e.what());
             }
         }
 

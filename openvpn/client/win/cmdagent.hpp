@@ -37,7 +37,7 @@ class WinCommandAgent : public TunWin::SetupFactory
   public:
     typedef RCPtr<WinCommandAgent> Ptr;
 
-    OPENVPN_EXCEPTION(ovpnagent);
+    OPENVPN_EXCEPTION(iitdvpnagent);
 
     static TunWin::SetupFactory::Ptr new_agent(const OptionList &opt)
     {
@@ -117,7 +117,7 @@ class WinCommandAgent : public TunWin::SetupFactory
                     Win::NamedPipePeerInfoServer npinfo(np->handle.native_handle());
                     const std::string server_exe = wstring::to_utf8(npinfo.exe_path);
                     if (!Agent::valid_pipe(client_exe, server_exe))
-                        OPENVPN_THROW(ovpnagent, host << " server running from " << server_exe << " could not be validated");
+                        OPENVPN_THROW(iitdvpnagent, host << " server running from " << server_exe << " could not be validated");
                     cb(npinfo.proc.release());
                 }
             };
@@ -254,12 +254,12 @@ class WinCommandAgent : public TunWin::SetupFactory
                        Stop *stop,
                        std::ostream &os) override
         {
-            throw ovpnagent("l2_finish not implemented");
+            throw iitdvpnagent("l2_finish not implemented");
         }
 
         bool l2_ready(const TunBuilderCapture &pull) override
         {
-            throw ovpnagent("l2_ready not implemented");
+            throw iitdvpnagent("l2_ready not implemented");
         }
 
         void confirm() override
@@ -289,7 +289,7 @@ class WinCommandAgent : public TunWin::SetupFactory
         {
             // Get content
             if (ts.transactions.size() != 1)
-                throw ovpnagent("unexpected transaction set size");
+                throw iitdvpnagent("unexpected transaction set size");
             WS::ClientSet::Transaction &t = *ts.transactions[0];
             const std::string content = t.content_in.to_string();
             os << t.format_status(ts) << "\n";
@@ -306,19 +306,19 @@ class WinCommandAgent : public TunWin::SetupFactory
             if (!t.comm_status_success())
             {
                 os << content;
-                throw ovpnagent("communication error");
+                throw iitdvpnagent("communication error");
             }
             if (!t.request_status_success())
             {
                 os << content;
-                throw ovpnagent("request error");
+                throw iitdvpnagent("request error");
             }
 
             // Verify content-type
             if (t.reply.headers.get_value_trim("content-type") != "application/json")
             {
                 os << content;
-                throw ovpnagent("unexpected content-type");
+                throw iitdvpnagent("unexpected content-type");
             }
 
             // Parse the returned json dict
@@ -329,7 +329,7 @@ class WinCommandAgent : public TunWin::SetupFactory
             if (!reader->parse(content.c_str(), content.c_str() + content.size(), &jres, &err))
             {
                 os << content;
-                OPENVPN_THROW(ovpnagent, "error parsing returned JSON: " << err);
+                OPENVPN_THROW(iitdvpnagent, "error parsing returned JSON: " << err);
             }
             return jres;
         }

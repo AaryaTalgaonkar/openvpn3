@@ -495,7 +495,7 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
                 cert.parse_pem(cert_text, "cert");
                 cn = OpenSSLPKI::x509_get_field(cert.obj(), NID_commonName);
             }
-            catch (const OpenSSLException &e)
+            catch (const OpenSSLException &)
             {
                 cn.clear();
             }
@@ -506,14 +506,14 @@ class OMI : public OMICore, public ClientAPI::LogReceiver
                 cert.parse(cert_text, "cert", true);
                 cn = MbedTLSPKI::x509_get_common_name(cert.get());
             }
-            catch (const MbedTLSException &e)
+            catch (const MbedTLSException &)
             {
                 cn.clear();
             }
 #else
 #endif
         }
-        catch (const std::exception &e)
+        catch (const std::exception &)
         {
             cn.clear();
         }

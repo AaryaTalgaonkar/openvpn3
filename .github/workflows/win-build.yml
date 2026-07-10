@@ -16,15 +16,14 @@ jobs:
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v7
-    - uses: lukka/get-cmake@9e07ecdcee1b12e5037e42f410b67f03e2f626e1 
+    - uses: lukka/get-cmake@v4.3.3 
     - name: Restore from cache and install vcpkg
-      uses: lukka/run-vcpkg@5e0cab206a5ea620130caf672fce3e4a6b5666a1 
+      uses: lukka/run-vcpkg@v11.6 
       with:
-        vcpkgGitCommitId: d1ff36c6520ee43f1a656c03cd6425c2974a449e
         vcpkgJsonGlob: '**/windows/vcpkg.json'
 
     - name: Run CMake with vcpkg.json manifest
-      uses: lukka/run-cmake@af1be47fd7c933593f687731bc6fdbee024d3ff4
+      uses: lukka/run-cmake@v10.9
       if: ${{ matrix.arch != 'arm64' }}
       with:
         configurePreset: win-${{ matrix.arch }}-release
@@ -32,7 +31,7 @@ jobs:
         testPreset: win-${{ matrix.arch }}-release
 
     - name: Run CMake with vcpkg.json manifest (NO TESTS)
-      uses: lukka/run-cmake@af1be47fd7c933593f687731bc6fdbee024d3ff4 
+      uses: lukka/run-cmake@v10.9 
       if: ${{ matrix.arch == 'arm64' }}
       with:
         configurePreset: win-${{ matrix.arch }}-release
